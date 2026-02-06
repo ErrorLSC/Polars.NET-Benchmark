@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8' />
+<title>ExcelMixedBenchmark-20260206-165732</title>
+
+<style type="text/css">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: right; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>
+</head>
+<body>
+<pre><code>
+BenchmarkDotNet v0.15.8, Linux Fedora Linux 43 (KDE Plasma Desktop Edition)
+Intel Core i7-10700 CPU 2.90GHz (Max: 0.80GHz), 1 CPU, 16 logical and 8 physical cores
+.NET SDK 10.0.102
+  [Host]     : .NET 10.0.2 (10.0.2, 10.0.226.5608), X64 RyuJIT x86-64-v3
+  Job-FGEKWY : .NET 10.0.2 (10.0.2, 10.0.226.5608), X64 RyuJIT x86-64-v3
+</code></pre>
+<pre><code>IterationCount=3  LaunchCount=1  WarmupCount=1  
+</code></pre>
+
+<table>
+<thead><tr><th>Method   </th><th>Mean</th><th>Error</th><th>StdDev</th><th>Ratio</th><th>RatioSD</th><th>Gen0  </th><th>Gen1 </th><th>Gen2</th><th>Allocated</th><th>Alloc Ratio</th>
+</tr>
+</thead><tbody><tr><td>Polars_Mixed</td><td>14.74 s</td><td>2.509 s</td><td>0.138 s</td><td>1.00</td><td>0.01</td><td>-</td><td>-</td><td>-</td><td>2.74 KB</td><td>1.00</td>
+</tr><tr><td>MiniExcel_Mixed</td><td>28.26 s</td><td>0.974 s</td><td>0.053 s</td><td>1.92</td><td>0.02</td><td>1950000.0000</td><td>26000.0000</td><td>-</td><td>15935125.02 KB</td><td>5,811,099.72</td>
+</tr><tr><td>EPPlus_Mixed</td><td>34.84 s</td><td>2.042 s</td><td>0.112 s</td><td>2.36</td><td>0.02</td><td>822000.0000</td><td>186000.0000</td><td>16000.0000</td><td>10328914.66 KB</td><td>3,766,669.73</td>
+</tr></tbody></table>
+</body>
+</html>

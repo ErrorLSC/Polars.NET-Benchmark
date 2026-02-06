@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8' />
+<title>ExcelBenchmark-20260205-194617</title>
+
+<style type="text/css">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: right; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>
+</head>
+<body>
+<pre><code>
+BenchmarkDotNet v0.15.8, Linux Fedora Linux 43 (KDE Plasma Desktop Edition)
+Intel Core i7-10700 CPU 2.90GHz (Max: 0.80GHz), 1 CPU, 16 logical and 8 physical cores
+.NET SDK 10.0.102
+  [Host]     : .NET 10.0.2 (10.0.2, 10.0.226.5608), X64 RyuJIT x86-64-v3
+  Job-FGEKWY : .NET 10.0.2 (10.0.2, 10.0.226.5608), X64 RyuJIT x86-64-v3
+</code></pre>
+<pre><code>IterationCount=3  LaunchCount=1  WarmupCount=1  
+</code></pre>
+
+<table>
+<thead><tr><th>Method    </th><th>Mean</th><th>Error</th><th>StdDev</th><th>Ratio</th><th>Gen0 </th><th>Gen1</th><th>Gen2</th><th>Allocated</th><th>Alloc Ratio</th>
+</tr>
+</thead><tbody><tr><td>MiniExcel_Read</td><td>4.737 s</td><td>0.2408 s</td><td>0.0132 s</td><td>1.00</td><td>398000.0000</td><td>1000.0000</td><td>-</td><td>3257760.18 KB</td><td>1.000</td>
+</tr><tr><td>EPPlus_Read</td><td>6.404 s</td><td>0.0888 s</td><td>0.0049 s</td><td>1.35</td><td>228000.0000</td><td>57000.0000</td><td>13000.0000</td><td>2759137.59 KB</td><td>0.847</td>
+</tr><tr><td>Polars_ReadExcel</td><td>2.996 s</td><td>0.1858 s</td><td>0.0102 s</td><td>0.63</td><td>-</td><td>-</td><td>-</td><td>2.42 KB</td><td>0.000</td>
+</tr></tbody></table>
+</body>
+</html>

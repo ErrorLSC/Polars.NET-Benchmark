@@ -1,0 +1,15 @@
+*.csv
+
+# --- .NET (C# & F#) ---
+**/bin/
+**/obj/
+.vs/
+.vscode/
+*.user
+*.suo
+*.tmp
+*.log
+*.txt
+*.sln
+
+.venv
