@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.15.8" />
-    <PackageReference Include="Polars.NET" Version="0.2.0-beta1" />
+    <PackageReference Include="Polars.NET" Version="0.2.1-beta1" />
   </ItemGroup>
 
 </Project>
