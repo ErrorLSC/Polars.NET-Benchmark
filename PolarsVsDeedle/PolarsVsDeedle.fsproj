@@ -12,7 +12,8 @@
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.15.8" />
     <PackageReference Include="Deedle" Version="3.0.0" />
-    <PackageReference Include="Polars.FSharp" Version="0.2.1-beta1" />
+    <PackageReference Include="Polars.FSharp" Version="0.3.0" />
+    <PackageReference Include="Polars.NET.Native.linux-x64" Version="0.3.0" />
   </ItemGroup>
 
 </Project>

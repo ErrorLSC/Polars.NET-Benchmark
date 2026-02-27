@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8' />
+<title>DeltaMutateBenchmarks-20260227-163509</title>
+
+<style type="text/css">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: right; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>
+</head>
+<body>
+<pre><code>
+BenchmarkDotNet v0.15.8, Linux Fedora Linux 43 (KDE Plasma Desktop Edition)
+Intel Core i7-10700 CPU 2.90GHz (Max: 0.80GHz), 1 CPU, 16 logical and 8 physical cores
+.NET SDK 10.0.102
+  [Host]     : .NET 10.0.2 (10.0.2, 10.0.226.5608), X64 RyuJIT x86-64-v3
+  Job-QKDGBD : .NET 10.0.2 (10.0.2, 10.0.226.5608), X64 RyuJIT x86-64-v3
+</code></pre>
+<pre><code>InvocationCount=1  IterationCount=10  UnrollFactor=1  
+WarmupCount=3  
+</code></pre>
+
+<table>
+<thead><tr><th>Method       </th><th>Mean</th><th>Error</th><th>StdDev</th><th>Allocated</th>
+</tr>
+</thead><tbody><tr><td>DeleteBench</td><td>43.04 ms</td><td>8.818 ms</td><td>5.833 ms</td><td>840 B</td>
+</tr><tr><td>OptimizeZOrderBench</td><td>215.92 ms</td><td>68.606 ms</td><td>45.379 ms</td><td>104 B</td>
+</tr><tr><td>MergeBench</td><td>451.05 ms</td><td>10.597 ms</td><td>7.010 ms</td><td>2456 B</td>
+</tr><tr><td>OverwriteBench</td><td>314.03 ms</td><td>14.727 ms</td><td>9.741 ms</td><td>1056 B</td>
+</tr></tbody></table>
+</body>
+</html>

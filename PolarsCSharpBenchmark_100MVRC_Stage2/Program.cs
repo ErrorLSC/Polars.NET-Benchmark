@@ -20,8 +20,8 @@ public static class PolarsVectorExtensions
     public static Expr CosineSimilarity(this Expr left, Expr right)
         => left.Dot(right) / (left.L2Norm() * right.L2Norm());
 
-    public static Expr Dot(this Expr left, Expr right) => (left * right).Array.Sum();
-    public static Expr L2Norm(this Expr col) => (col * col).Array.Sum().Sqrt();
+    // public static Expr Dot(this Expr left, Expr right) => (left * right).Array.Sum();
+    public static Expr L2Norm(this Expr col) => col.Pow(2).Array.Sum().Sqrt();
 }
 
 [SimpleJob(launchCount: 1, warmupCount: 1, iterationCount: 3)]
@@ -105,7 +105,7 @@ public class CosineBenchmark
         var res = _df.Select(
             Col("vec")
                 .CosineSimilarity(Lit(_querySeries))
-                .Sum()
+                .Array.Sum()
                 .Alias("res")
         );
 

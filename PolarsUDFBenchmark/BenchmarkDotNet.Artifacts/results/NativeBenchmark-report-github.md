@@ -10,4 +10,4 @@ Intel Core i7-10700 CPU 2.90GHz (Max: 0.80GHz), 1 CPU, 16 logical and 8 physical
 ```
 | Method                     | Mean     | Error    | StdDev   | Allocated |
 |--------------------------- |---------:|---------:|---------:|----------:|
-| PolarsDotNet_NativeGroupBy | 16.75 ms | 0.268 ms | 0.251 ms |     741 B |
+| PolarsDotNet_NativeGroupBy | 17.71 ms | 0.254 ms | 0.238 ms |     741 B |

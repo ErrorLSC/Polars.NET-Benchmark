@@ -10,4 +10,4 @@ Intel Core i7-10700 CPU 2.90GHz (Max: 0.80GHz), 1 CPU, 16 logical and 8 physical
 ```
 | Method                 | Mean     | Error   | StdDev  | Gen0       | Gen1      | Gen2      | Allocated |
 |----------------------- |---------:|--------:|--------:|-----------:|----------:|----------:|----------:|
-| PolarsDotNet_StringUdf | 177.6 ms | 0.92 ms | 0.82 ms | 28000.0000 | 1333.3333 | 1333.3333 | 228.74 MB |
+| PolarsDotNet_StringUdf | 174.3 ms | 2.08 ms | 1.95 ms | 27333.3333 | 1000.0000 | 1000.0000 | 216.79 MB |

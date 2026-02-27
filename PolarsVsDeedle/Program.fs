@@ -3,9 +3,7 @@ open BenchmarkDotNet.Attributes
 open BenchmarkDotNet.Running
 open Deedle
 open Polars.FSharp
-open BenchmarkDotNet.Engines
 
-[<SimpleJob(RunStrategy.Monitoring, launchCount = 1, warmupCount = 1, iterationCount = 3)>]
 [<MemoryDiagnoser>]
 type DeedleVsPolars () =
 
