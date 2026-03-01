@@ -56,7 +56,7 @@ def plot_benchmark(df, title, filename, is_write=False):
     # 在柱子上添加数值标签
     for p in ax.patches:
         height = p.get_height()
-        if not np.isnan(height):
+        if height > 0:
             ax.annotate(f'{height:.2f}', 
                         (p.get_x() + p.get_width() / 2., height), 
                         ha='center', va='bottom', 
