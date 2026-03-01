@@ -11,6 +11,6 @@ IterationCount=20  WarmupCount=5
 ```
 | Method             | Mean      | Error    | StdDev   | Ratio | Gen0     | Allocated  | Alloc Ratio |
 |------------------- |----------:|---------:|---------:|------:|---------:|-----------:|------------:|
-| FullScan           | 228.85 ms | 1.717 ms | 1.838 ms |  1.00 | 333.3333 | 3241.01 KB |       1.000 |
-| PredicatePushdown  |  33.13 ms | 0.860 ms | 0.990 ms |  0.14 |        - |  126.44 KB |       0.039 |
-| GroupByAggregation |  14.38 ms | 0.047 ms | 0.046 ms |  0.06 |        - |    4.86 KB |       0.001 |
+| FullScan           | 230.66 ms | 1.212 ms | 1.297 ms |  1.00 | 333.3333 | 3241.01 KB |       1.000 |
+| PredicatePushdown  |  33.59 ms | 0.859 ms | 0.954 ms |  0.15 |        - |  126.44 KB |       0.039 |
+| GroupByAggregation |  14.50 ms | 0.056 ms | 0.065 ms |  0.06 |        - |    4.86 KB |       0.001 |

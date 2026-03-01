@@ -22,32 +22,27 @@ using DuckDB.NET.Data;
 
 public class RunBenchmark
 {    
-    public static void Main(string[] args)
+    public static void Main()
     {
-        var summary = BenchmarkRunner.Run<DeltaMutateBenchmarks>();
+        BenchmarkRunner.Run<DeltaLakeQueryBenchmark>();
     }
 }
 
-// 让 BenchmarkDotNet 帮我们监控内存分配
 [MemoryDiagnoser]
-[WarmupCount(5)]       // 增加预热，填满 OS Cache
-[IterationCount(20)]   // 固定迭代次数
-// 如果你用的是 .NET 8/9，还可以加上 AOT 的测试维度
-// [SimpleJob(RuntimeMoniker.NativeAot80)] 
+[WarmupCount(5)]       
+[IterationCount(20)]  
 public class DeltaLakeQueryBenchmark
 {
     private string _deltaPath = "/home/qinglei/Projects/PolarsDotnetBenchmark/PolarsDeltaBenchmark/data/ny_taxi_2025_01.delta";
 
-    // 1. 全量扫描：测试引擎读取 Delta Log 并扫完所有 Parquet 块的裸 I/O 速度
     [Benchmark(Baseline = true)]
     public void FullScan()
     {
         var lf = LazyFrame.ScanDelta(_deltaPath);
-        var df = lf.Collect(); 
+        var df = lf.Collect(useStreaming:true); 
     }
 
-    // 2. 谓词下推 (Predicate Pushdown)：这是 Delta / Parquet 的灵魂
-    // 引擎应该只去读取包含 1 月 15 日数据的行组 (RowGroups)，跳过其他数据
+
     [Benchmark]
     public void PredicatePushdown()
     {
@@ -55,11 +50,10 @@ public class DeltaLakeQueryBenchmark
         var result = lf.Filter(
             Col("tpep_pickup_datetime") >= Lit(new DateTime(2025, 1, 15)) &
             Col("tpep_pickup_datetime") < Lit(new DateTime(2025, 1, 16))
-        ).Collect();
+        ).Collect(useStreaming:true);
     }
 
-    // 3. 列裁剪 + 聚合 (Projection Pushdown + Aggregation)
-    // 应该极其省内存，因为只把 passenger_count 和 total_amount 两列反序列化到内存
+
     [Benchmark]
     public void GroupByAggregation()
     {
@@ -70,13 +64,13 @@ public class DeltaLakeQueryBenchmark
                 Col("total_amount").Sum().Alias("total_revenue"),
                 Col("total_amount").Mean().Alias("avg_fare")
             )
-            .Collect();
+            .Collect(useStreaming:true);
     }
 }
 
 [MemoryDiagnoser]
-[WarmupCount(5)]       // 增加预热，填满 OS Cache
-[IterationCount(20)]   // 固定迭代次数
+[WarmupCount(5)]      
+[IterationCount(20)]   
 public class DuckDbDeltaBenchmark : IDisposable
 {
     private readonly DuckDBConnection _connection;
@@ -84,32 +78,30 @@ public class DuckDbDeltaBenchmark : IDisposable
 
     public DuckDbDeltaBenchmark()
     {
-        // 打开内存数据库连接
+
         _connection = new DuckDBConnection("DataSource=:memory:");
         _connection.Open();
 
         using var cmd = _connection.CreateCommand();
-        // DuckDB 需要安装和加载 delta 插件
+
         cmd.CommandText = "INSTALL delta; LOAD delta;";
         cmd.ExecuteNonQuery();
     }
 
-    // 1. 全量扫描
+
     [Benchmark(Baseline = true)]
     public void FullScan()
     {
         using var cmd = _connection.CreateCommand();
-        // 注意：为了贴近 Polars 的 Collect() (在底层物化但不一定全量拷贝到托管内存)
-        // 我们用 COUNT() 或者直接把数据查出来并丢弃，这里我们遍历 DataReader 模拟数据消费
+
         cmd.CommandText = $"SELECT * FROM delta_scan('{_deltaPath}')";
         using var reader = cmd.ExecuteReader();
         while (reader.Read())
         {
-            // 仅仅步进，不取出具体字段，最小化 C# 托管内存分配带来的噪音
+            
         }
     }
 
-    // 2. 谓词下推 (Predicate Pushdown)
     [Benchmark]
     public void PredicatePushdown()
     {
@@ -123,7 +115,6 @@ public class DuckDbDeltaBenchmark : IDisposable
         while (reader.Read()) { }
     }
 
-    // 3. 列裁剪 + 聚合
     [Benchmark]
     public void GroupByAggregation()
     {
@@ -138,7 +129,6 @@ public class DuckDbDeltaBenchmark : IDisposable
         using var reader = cmd.ExecuteReader();
         while (reader.Read())
         {
-            // 聚合结果很小，我们直接读取出来
             var passengerCount = reader.IsDBNull(0) ? 0 : reader.GetInt64(0);
             var totalRevenue = reader.IsDBNull(1) ? 0 : reader.GetDouble(1);
             var avgFare = reader.IsDBNull(2) ? 0 : reader.GetDouble(2);
@@ -153,7 +143,7 @@ public class DuckDbDeltaBenchmark : IDisposable
 
 [MemoryDiagnoser]
 [WarmupCount(3)]
-[IterationCount(10)] // 因为这些是写操作，稍微耗时一些，迭代次数可以设小一点
+[IterationCount(10)]
 public class DeltaMutateBenchmarks
 {
     private readonly string _baseDataPath = "/home/qinglei/Projects/PolarsDotnetBenchmark/PolarsDeltaBenchmark/data/ny_taxi_2025_01.delta"; 
@@ -161,29 +151,26 @@ public class DeltaMutateBenchmarks
     private readonly string _deletePath = "/home/qinglei/Projects/PolarsDotnetBenchmark/PolarsDeltaBenchmark/data/bench_delete.delta";
     private readonly string _optimizePath = "/home/qinglei/Projects/PolarsDotnetBenchmark/PolarsDeltaBenchmark/data/bench_optimize.delta";
     private readonly string _mergePath = "/home/qinglei/Projects/PolarsDotnetBenchmark/PolarsDeltaBenchmark/data/bench_merge.delta";
-    // 新增 Overwrite 的测试路径
     private readonly string _overwritePath = "/home/qinglei/Projects/PolarsDotnetBenchmark/PolarsDeltaBenchmark/data/bench_overwrite.delta";
-
+    private readonly string _checksumCsvPath = "/home/qinglei/Projects/PolarsDotnetBenchmark/PolarsDeltaBenchmark/benchmark_checksums_polars.csv";
     private LazyFrame _mergeSourceLf;
 
+    private readonly HashSet<string> _printedChecksums = [];
+
     // ==========================================
-    // 1. 全局数据准备 (不计入 Benchmark 耗时)
+    // Data Prepare
     // ==========================================
     [GlobalSetup]
     public void GlobalSetup()
     {
         var baseLf = LazyFrame.ScanDelta(_baseDataPath);
-        _mergeSourceLf = baseLf.Limit(10000)
-            .Unique(
-                subset: Selector.Cols(["VendorID", "tpep_pickup_datetime"]), 
-                keep: UniqueKeepStrategy.First
-            )
-            .WithColumns((Col("total_amount") + 5.0).Alias("total_amount")) 
-            .Collect().Lazy();
+        _mergeSourceLf = LazyFrame.ScanDelta("/home/qinglei/Projects/PolarsDotnetBenchmark/PolarsDeltaBenchmark/data/bench_source.delta");
+
+        PrintChecksum("BaseData", _baseDataPath);
     }
 
     // ==========================================
-    // 2. 迭代前的数据重置 (每次跑 Benchmark 前恢复现场)
+    // Setup
     // ==========================================
     [IterationSetup(Target = nameof(DeleteBench))]
     public void SetupDelete()
@@ -196,7 +183,6 @@ public class DeltaMutateBenchmarks
     public void SetupOptimize()
     {
         if (Directory.Exists(_optimizePath)) Directory.Delete(_optimizePath, true);
-        
         var baseLf = LazyFrame.ScanDelta(_baseDataPath).Limit(500000);
         
         for (int i = 0; i < 50; i++)
@@ -214,19 +200,31 @@ public class DeltaMutateBenchmarks
         Delta.AddFeature(_mergePath, DeltaTableFeatures.DeletionVectors, allowProtocolIncrease: true);
     }
 
-    // 新增 Overwrite 的 Setup
     [IterationSetup(Target = nameof(OverwriteBench))]
     public void SetupOverwrite()
     {
-        // 覆写测试最好的场景是：目标路径已经有一张表了。
-        // 这样可以测试 Delta 引擎处理旧文件（将其标记为 removed）以及写入新事务日志的性能
-        
         CopyDirectory(_baseDataPath, _overwritePath);
         Delta.AddFeature(_overwritePath, DeltaTableFeatures.DeletionVectors, allowProtocolIncrease: true);
     }
 
     // ==========================================
-    // 3. 核心 Benchmark 战场
+    // Checksum
+    // ==========================================
+    
+    [IterationCleanup(Target = nameof(DeleteBench))]
+    public void CleanupDelete() => PrintChecksum("DeleteBench", _deletePath);
+
+    [IterationCleanup(Target = nameof(OptimizeZOrderBench))]
+    public void CleanupOptimize() => PrintChecksum("OptimizeZOrderBench", _optimizePath);
+
+    [IterationCleanup(Target = nameof(MergeBench))]
+    public void CleanupMerge() => PrintChecksum("MergeBench", _mergePath);
+
+    [IterationCleanup(Target = nameof(OverwriteBench))]
+    public void CleanupOverwrite() => PrintChecksum("OverwriteBench", _overwritePath);
+
+    // ==========================================
+    // Benchmark
     // ==========================================
 
     [Benchmark]
@@ -250,29 +248,82 @@ public class DeltaMutateBenchmarks
     [Benchmark]
     public void MergeBench()
     {
-        _mergeSourceLf.MergeDelta(
-            path: _mergePath,
-            mergeKeys: ["VendorID", "tpep_pickup_datetime"],
-            matchedUpdateCond: Source("total_amount") > Target("total_amount") | Target("total_amount").IsNull(),
-            matchedDeleteCond: Source("total_amount") < 0.0,
-            notMatchedInsertCond: Source("passenger_count") > 0 & Source("total_amount") > 0.0,
-            notMatchedBySourceDeleteCond: Target("total_amount") <= 0.01,
-            canEvolve: false
-        );
+        var updateCond = (Delta.Source("total_amount") > Delta.Target("total_amount") | Delta.Target("total_amount").IsNull()) 
+                         & Delta.Source("total_amount") >= 10.0;
+                         
+        var deleteCond = Delta.Source("total_amount") < 50.0; 
+        
+        var insertCond = Delta.Source("passenger_count") > 0 & Delta.Source("total_amount") > 0.0;
+        var srcDeleteCond = Delta.Target("total_amount") <= 0.01;
+
+        _mergeSourceLf.MergeDeltaOrdered(
+                path: _mergePath,
+                mergeKeys: ["VendorID", "tpep_pickup_datetime"],
+                canEvolve: false
+            )
+            .WhenMatchedDelete(deleteCond)
+            
+            .WhenMatchedUpdate(updateCond)
+            
+            .WhenNotMatchedInsert(insertCond)
+            
+            .WhenNotMatchedBySourceDelete(srcDeleteCond)
+            
+            .Execute(); 
     }
 
-    // 新增的 Overwrite Benchmark
     [Benchmark]
     public void OverwriteBench()
     {
-        // 测试点：覆写整张表。底层不仅要写新的 Parquet，还要更新 _delta_log，把旧数据全部 Tombstone 掉。
-        // 注：如果 C# 端的 mode 采用的是强类型 Enum，请改为类似 mode: DeltaWriteMode.Overwrite
         LazyFrame.ScanDelta(_baseDataPath)
             .WithColumns((Col("total_amount") * 0.9).Alias("total_amount"))
             .SinkDelta(_overwritePath, mode: DeltaSaveMode.Overwrite);
     }
 
-    // --- 辅助方法 ---
+    // ==========================================
+    // Helpers
+    // ==========================================
+
+    private void PrintChecksum(string benchName, string path)
+    {
+        if (!_printedChecksums.Add(benchName)) return;
+
+        bool writeHeader = !File.Exists(_checksumCsvPath);
+
+        try
+        {
+            using var df = LazyFrame.ScanDelta(path)
+                .Select(Col("total_amount").Sum())
+                .Collect();
+
+            var sumValue = df["total_amount"].GetValue<double>(0); 
+
+            Console.WriteLine($"\n[CHECKSUM VERIFIED] {benchName,-20} | Total Amount Sum: {sumValue:F4}\n");
+
+            using (var writer = new StreamWriter(_checksumCsvPath, append: true))
+            {
+                if (writeHeader)
+                {
+                    writer.WriteLine("BenchmarkName,TotalAmountSum,Status"); 
+                }
+                writer.WriteLine($"{benchName},{sumValue:F4},SUCCESS");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"\n[CHECKSUM ERROR] {benchName} | Failed to compute checksum: {ex.Message}\n");
+            
+            using (var writer = new StreamWriter(_checksumCsvPath, append: true))
+            {
+                if (writeHeader)
+                {
+                    writer.WriteLine("BenchmarkName,TotalAmountSum,Status");
+                }
+                writer.WriteLine($"{benchName},0.0000,ERROR: {ex.Message.Replace(",", ";")}"); 
+            }
+        }
+    }
+
     private static void CopyDirectory(string sourceDir, string destinationDir)
     {
         if (Directory.Exists(destinationDir)) Directory.Delete(destinationDir, true);

@@ -7,21 +7,21 @@ delta_path = "/home/qinglei/Projects/PolarsDotnetBenchmark/PolarsDeltaBenchmark/
 
 def full_scan():
     # 1. 全量扫描
-    pl.scan_delta(delta_path).collect()
+    pl.scan_delta(delta_path).collect(engine="streaming")
 
 def predicate_pushdown():
     # 2. 谓词下推
     pl.scan_delta(delta_path).filter(
         (pl.col("tpep_pickup_datetime") >= datetime(2025, 1, 15)) &
         (pl.col("tpep_pickup_datetime") < datetime(2025, 1, 16))
-    ).collect()
+    ).collect(engine="streaming")
 
 def groupby_aggregation():
     # 3. 列裁剪 + 聚合
     pl.scan_delta(delta_path).group_by("passenger_count").agg(
         pl.col("total_amount").sum().alias("total_revenue"),
         pl.col("total_amount").mean().alias("avg_fare")
-    ).collect()
+    ).collect(engine="streaming")
 
 # 微型 Benchmark 运行器
 def run_bench(name, func, warmup=5, iters=20):

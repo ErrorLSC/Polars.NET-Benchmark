@@ -12,7 +12,7 @@ WarmupCount=3
 ```
 | Method              | Mean      | Error     | StdDev    | Allocated |
 |-------------------- |----------:|----------:|----------:|----------:|
-| DeleteBench         |  43.04 ms |  8.818 ms |  5.833 ms |     840 B |
-| OptimizeZOrderBench | 215.92 ms | 68.606 ms | 45.379 ms |     104 B |
-| MergeBench          | 451.05 ms | 10.597 ms |  7.010 ms |    2456 B |
-| OverwriteBench      | 314.03 ms | 14.727 ms |  9.741 ms |    1056 B |
+| DeleteBench         |  47.84 ms |  2.422 ms |  1.441 ms |     840 B |
+| OptimizeZOrderBench | 172.01 ms | 21.320 ms | 14.102 ms |     104 B |
+| MergeBench          | 467.43 ms | 27.523 ms | 18.205 ms |    3200 B |
+| OverwriteBench      | 328.95 ms | 26.844 ms | 17.756 ms |    1088 B |

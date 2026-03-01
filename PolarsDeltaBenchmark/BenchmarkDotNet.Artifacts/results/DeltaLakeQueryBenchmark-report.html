@@ -2,7 +2,7 @@
 <html lang='en'>
 <head>
 <meta charset='utf-8' />
-<title>DeltaLakeQueryBenchmark-20260227-140311</title>
+<title>DeltaLakeQueryBenchmark-20260301-142253</title>
 
 <style type="text/css">
 	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
@@ -17,16 +17,17 @@ BenchmarkDotNet v0.15.8, Linux Fedora Linux 43 (KDE Plasma Desktop Edition)
 Intel Core i7-10700 CPU 2.90GHz (Max: 0.80GHz), 1 CPU, 16 logical and 8 physical cores
 .NET SDK 10.0.102
   [Host]     : .NET 10.0.2 (10.0.2, 10.0.226.5608), X64 RyuJIT x86-64-v3
-  DefaultJob : .NET 10.0.2 (10.0.2, 10.0.226.5608), X64 RyuJIT x86-64-v3
+  Job-NUBXJZ : .NET 10.0.2 (10.0.2, 10.0.226.5608), X64 RyuJIT x86-64-v3
 </code></pre>
-<pre><code></code></pre>
+<pre><code>IterationCount=20  WarmupCount=5  
+</code></pre>
 
 <table>
-<thead><tr><th>Method      </th><th>Mean</th><th>Error</th><th>StdDev</th><th>Median</th><th>Ratio</th><th>RatioSD</th><th>Allocated</th><th>Alloc Ratio</th>
+<thead><tr><th>Method      </th><th>Mean</th><th>Error</th><th>StdDev</th><th>Ratio</th><th>RatioSD</th><th>Allocated</th><th>Alloc Ratio</th>
 </tr>
-</thead><tbody><tr><td>FullScan</td><td>81.66 ms</td><td>1.630 ms</td><td>2.285 ms</td><td>81.05 ms</td><td>1.00</td><td>0.04</td><td>163 B</td><td>1.00</td>
-</tr><tr><td>PredicatePushdown</td><td>21.49 ms</td><td>2.172 ms</td><td>6.403 ms</td><td>21.95 ms</td><td>0.26</td><td>0.08</td><td>813 B</td><td>4.99</td>
-</tr><tr><td>GroupByAggregation</td><td>25.56 ms</td><td>0.526 ms</td><td>1.518 ms</td><td>24.73 ms</td><td>0.31</td><td>0.02</td><td>1069 B</td><td>6.56</td>
+</thead><tbody><tr><td>FullScan</td><td>91.37 ms</td><td>3.245 ms</td><td>3.472 ms</td><td>1.00</td><td>0.05</td><td>163 B</td><td>1.00</td>
+</tr><tr><td>PredicatePushdown</td><td>11.86 ms</td><td>0.186 ms</td><td>0.214 ms</td><td>0.13</td><td>0.01</td><td>802 B</td><td>4.92</td>
+</tr><tr><td>GroupByAggregation</td><td>24.25 ms</td><td>0.734 ms</td><td>0.845 ms</td><td>0.27</td><td>0.01</td><td>1133 B</td><td>6.95</td>
 </tr></tbody></table>
 </body>
 </html>
